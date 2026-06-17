@@ -1,8 +1,8 @@
 Frontend (Flutter Web — GitHub Pages):
-https://aar25.github.io/psx-dividend-machine/
+https://AbdulRehman732.github.io/PortfolioCalculator/
 
 Backend (Node.js — Render):
-https://psx-dividend-machine.onrender.com
+https://portfolio-calculator-backend.onrender.com
 
 Repository:
-https://github.com/aar25/psx-dividend-machine
+https://github.com/AbdulRehman732/PortfolioCalculator

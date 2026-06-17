@@ -100,7 +100,7 @@ jobs:
         run: flutter test test/unit/ --reporter=expanded
 
       - name: Build Flutter Web
-        run: flutter build web --release --base-href /psx-dividend-machine/
+        run: flutter build web --release --base-href /PortfolioCalculator/
 
       # Upload web build as artifact for the deploy job
       - name: Upload web build artifact
