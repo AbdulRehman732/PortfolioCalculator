@@ -17,14 +17,41 @@ const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 const stockListCache = { data: null, timestamp: null };
 const STOCK_LIST_TTL = 60 * 60 * 1000; // 1 hour
 /**
- * Fetch live price from PSX website
- * @param {string} symbol - Stock symbol (e.g., 'FFC')
- * @returns {Promise<number>} - Stock price or null if fetch fails
+ * Parse a price string in Pakistani Rupee format (e.g. "Rs.1,234.56").
+ * Extracted as a named helper for testability and reuse.
+ *
+ * @param {string} text - Raw price text from the PSX page
+ * @returns {number|null}  Parsed float, or null if the text is not a valid price
  */
-async function fetchLivePrice(symbol) {
-  try {
-    const url = `https://dps.psx.com.pk/company/${symbol.toUpperCase()}`;
+function parsePriceText(text) {
+  if (!text || typeof text !== "string") return null;
+  // Match the first sequence of digits (with optional commas and a decimal part)
+  const match = text.match(/([\d,]+\.?\d*)/);
+  if (!match) return null;
+  const price = parseFloat(match[1].replace(/,/g, ""));
+  return isNaN(price) || price <= 0 ? null : price;
+}
 
+/**
+ * Fetch the live closing price for a PSX-listed stock with retry logic.
+ *
+ * Improvements over original:
+ *  - Retries up to MAX_RETRIES times with exponential back-off
+ *  - Uses the named parsePriceText() helper (easier to unit-test)
+ *  - Differentiates between network errors and parsing failures in logs
+ *  - Validates that the returned price is a positive finite number
+ *
+ * @param {string} symbol       Stock symbol (e.g. 'FFC') — case-insensitive
+ * @param {number} [attempt=1]  Internal retry counter (do not pass manually)
+ * @returns {Promise<number|null>} Closing price, or null on failure
+ */
+async function fetchLivePrice(symbol, attempt = 1) {
+  const MAX_RETRIES = 3;
+  const BASE_DELAY_MS = 500;
+  const upperSymbol = symbol.toUpperCase();
+  const url = `https://dps.psx.com.pk/company/${upperSymbol}`;
+
+  try {
     const response = await axios.get(url, {
       timeout: 10000,
       headers: {
@@ -35,20 +62,32 @@ async function fetchLivePrice(symbol) {
 
     const $ = cheerio.load(response.data);
     const priceText = $(".quote__close").first().text().trim();
+    const price = parsePriceText(priceText);
 
-    if (priceText) {
-      // Extract number from "Rs.XXX.XX" format
-      const price = parseFloat(priceText.replace(/[Rs.,]/g, ""));
-      if (!isNaN(price)) {
-        return price;
-      }
+    if (price !== null) {
+      return price;
     }
 
-    return null;
+    console.warn(
+      `[fetchLivePrice] Could not parse price for ${upperSymbol}. ` +
+        `Raw text: "${priceText}" (attempt ${attempt}/${MAX_RETRIES})`
+    );
   } catch (error) {
-    console.error(`Error fetching price for ${symbol}:`, error.message);
-    return null;
+    const isTimeout = error.code === "ECONNABORTED" || error.code === "ETIMEDOUT";
+    console.error(
+      `[fetchLivePrice] ${isTimeout ? "Timeout" : "Network error"} for ` +
+        `${upperSymbol} (attempt ${attempt}/${MAX_RETRIES}): ${error.message}`
+    );
   }
+
+  // Retry with exponential back-off
+  if (attempt < MAX_RETRIES) {
+    const delay = BASE_DELAY_MS * Math.pow(2, attempt - 1);
+    await new Promise((resolve) => setTimeout(resolve, delay));
+    return fetchLivePrice(symbol, attempt + 1);
+  }
+
+  return null;
 }
 
 /**

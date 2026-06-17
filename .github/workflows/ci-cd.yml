@@ -1,0 +1,155 @@
+name: CI/CD — PSX Dividend Machine
+
+# ─── AI Prompt used to generate/optimize this pipeline ───────────────────────
+# "Write a GitHub Actions CI/CD pipeline for a monorepo containing a Flutter app
+#  (in psx_app/) and a Node.js Express backend (in backend/). The pipeline should:
+#  - Run on every push to main and on pull requests
+#  - Have parallel lint, test, and build jobs with dependency caching
+#  - Flutter job: analyze, test, build web
+#  - Node.js job: eslint, jest tests
+#  - Deploy Flutter web to GitHub Pages on main branch only
+#  - Deploy backend to Render via webhook on main branch only
+#  - Use environment secrets for deploy tokens"
+# Generated & optimized by: Antigravity AI (Google DeepMind)
+# ─────────────────────────────────────────────────────────────────────────────
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  # ═══════════════════════════════════════════════════════════════════════════
+  # JOB 1 — Lint & Test Node.js backend
+  # ═══════════════════════════════════════════════════════════════════════════
+  backend-test:
+    name: 🔍 Backend — Lint & Test
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Cache node_modules for faster subsequent runs (AI optimization)
+      - name: Cache Node modules
+        uses: actions/cache@v4
+        with:
+          path: backend/node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('backend/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint (ESLint)
+        run: npm run lint || true   # Warn only — don't fail CI on style issues
+
+      - name: Run Jest tests
+        run: npm test
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # JOB 2 — Lint, Test & Build Flutter Web
+  # ═══════════════════════════════════════════════════════════════════════════
+  flutter-test-build:
+    name: 🐦 Flutter — Lint, Test & Build Web
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: psx_app
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter (stable)
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.x"
+          channel: "stable"
+          # AI optimization: cache Flutter SDK between runs
+          cache: true
+
+      # Cache pub dependencies for faster subsequent runs (AI optimization)
+      - name: Cache Dart pub cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.pub-cache
+          key: ${{ runner.os }}-pub-${{ hashFiles('psx_app/pubspec.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pub-
+
+      - name: Get Flutter packages
+        run: flutter pub get
+
+      - name: Analyze (flutter analyze)
+        run: flutter analyze --no-fatal-infos
+
+      - name: Run Flutter unit tests
+        run: flutter test test/unit/ --reporter=expanded
+
+      - name: Build Flutter Web
+        run: flutter build web --release --base-href /psx-dividend-machine/
+
+      # Upload web build as artifact for the deploy job
+      - name: Upload web build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: flutter-web-build
+          path: psx_app/build/web/
+          retention-days: 1
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # JOB 3 — Deploy Flutter Web to GitHub Pages  (main branch only)
+  # ═══════════════════════════════════════════════════════════════════════════
+  deploy-frontend:
+    name: 🚀 Deploy Flutter Web → GitHub Pages
+    runs-on: ubuntu-latest
+    needs: [flutter-test-build, backend-test]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Download web build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: flutter-web-build
+          path: build/web
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: build/web
+          publish_branch: gh-pages
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # JOB 4 — Deploy Backend to Render  (main branch only)
+  # ═══════════════════════════════════════════════════════════════════════════
+  deploy-backend:
+    name: 🚀 Deploy Backend → Render
+    runs-on: ubuntu-latest
+    needs: [backend-test]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+
+    steps:
+      - name: Trigger Render deploy webhook
+        run: |
+          curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK_URL }}" \
+            --fail \
+            --silent \
+            --show-error
+        # RENDER_DEPLOY_HOOK_URL is set in GitHub repo → Settings → Secrets
