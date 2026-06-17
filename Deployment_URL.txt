@@ -1,8 +1,5 @@
-Frontend (Flutter Web — GitHub Pages):
-https://AbdulRehman732.github.io/PortfolioCalculator/
-
-Backend (Node.js — Render):
-https://portfolio-calculator-backend.onrender.com
+Frontend & Backend (Netlify):
+https://portfolio-calculator.netlify.app
 
 Repository:
 https://github.com/AbdulRehman732/PortfolioCalculator

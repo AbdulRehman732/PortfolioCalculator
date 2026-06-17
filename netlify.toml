@@ -1,0 +1,29 @@
+[build]
+  # We build the Flutter web app. Netlify will run this command.
+  command = "cd psx_app && flutter build web --release"
+  
+  # The output directory that Netlify will deploy
+  publish = "psx_app/build/web"
+  
+  # Where Netlify Serverless Functions are located
+  functions = "netlify/functions"
+
+[functions]
+  # Tell Netlify to use Node for the functions
+  node_bundler = "esbuild"
+  # Since our function imports from the backend folder, we need to include it
+  included_files = ["backend/**"]
+
+# ─── API Redirects ────────────────────────────────────────────────────────────
+# Any request starting with /api/ will be routed to our Express app function.
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/api/:splat"
+  status = 200
+
+# ─── SPA Fallback ─────────────────────────────────────────────────────────────
+# Any other request will fall back to index.html (for Flutter Web routing)
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

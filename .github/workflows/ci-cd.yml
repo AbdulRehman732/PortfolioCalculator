@@ -100,7 +100,7 @@ jobs:
         run: flutter test test/unit/ --reporter=expanded
 
       - name: Build Flutter Web
-        run: flutter build web --release --base-href /PortfolioCalculator/
+        run: flutter build web --release
 
       # Upload web build as artifact for the deploy job
       - name: Upload web build artifact
@@ -110,46 +110,4 @@ jobs:
           path: psx_app/build/web/
           retention-days: 1
 
-  # ═══════════════════════════════════════════════════════════════════════════
-  # JOB 3 — Deploy Flutter Web to GitHub Pages  (main branch only)
-  # ═══════════════════════════════════════════════════════════════════════════
-  deploy-frontend:
-    name: 🚀 Deploy Flutter Web → GitHub Pages
-    runs-on: ubuntu-latest
-    needs: [flutter-test-build, backend-test]
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
 
-    permissions:
-      contents: write
-
-    steps:
-      - name: Download web build artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: flutter-web-build
-          path: build/web
-
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v4
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: build/web
-          publish_branch: gh-pages
-
-  # ═══════════════════════════════════════════════════════════════════════════
-  # JOB 4 — Deploy Backend to Render  (main branch only)
-  # ═══════════════════════════════════════════════════════════════════════════
-  deploy-backend:
-    name: 🚀 Deploy Backend → Render
-    runs-on: ubuntu-latest
-    needs: [backend-test]
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-
-    steps:
-      - name: Trigger Render deploy webhook
-        run: |
-          curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK_URL }}" \
-            --fail \
-            --silent \
-            --show-error
-        # RENDER_DEPLOY_HOOK_URL is set in GitHub repo → Settings → Secrets

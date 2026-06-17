@@ -1,0 +1,14 @@
+Select a real-world software project, and build the project using an AI code generation assistant, generate unit tests and test data with AI, and create a CI/CD pipeline (lint → test → build → deploy) to deploy the application to a live cloud platform. All AI interactions must be documented with screenshots and descriptive captions.
+1.	Create a Git repository (e.g., GitHub, GitLab) for your project.
+2.	Generate code using AI 
+•	Use an AI code generation assistant to produce significant code.
+•	Ask the AI to refactor one existing function (improve readability, performance, or error handling).
+3.	Generate unit tests and test data 
+•	Prompt the AI to create unit tests for at least five functions (covering normal, edge, and invalid cases).
+•	Run the tests using your framework’s test runner.
+4.	Create CI/CD pipeline
+•	Write a pipeline configuration (e.g., .gitlab-ci.yml, .github/workflows/*.yml) 
+•	Use an AI assistant to help write, debug, or optimise the pipeline (e.g., caching dependencies, parallel jobs).
+5.	Deploy the application to any free cloud platform. Ensure the application is accessible via a live URL.
+o	No screenshot needed – just provide the URL in Deployment_URL.txt.
+6.	Create a single PDF with each screenshot on a separate page. Each screenshot must have a 2 to 3 sentence caption explaining the AI assisted step and its outcome. Also  provide the repository URL, deployment URL, screenshots PDF, and AI prompt in a ZIP file.

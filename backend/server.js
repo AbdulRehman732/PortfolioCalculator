@@ -355,9 +355,14 @@ app.get("/api/cache/clear", (req, res) => {
   });
 });
 
-// Start server
-app.listen(PORT, () => {
-  console.log(`PSX Proxy Server running on http://localhost:${PORT}`);
-  console.log(`Health check: http://localhost:${PORT}/api/health`);
-  console.log(`Example: http://localhost:${PORT}/api/stock/FFC/price`);
-});
+// Start server only if run directly (not imported as a module by serverless-http)
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`PSX Proxy Server running on http://localhost:${PORT}`);
+    console.log(`Health check: http://localhost:${PORT}/api/health`);
+    console.log(`Example: http://localhost:${PORT}/api/stock/FFC/price`);
+  });
+}
+
+// Export app for serverless wrapping (Netlify Functions)
+module.exports = app;
