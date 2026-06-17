@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>PSX Dividend Machine — Investment Command Center</title>
+<meta name="description" content="Your personal PSX investment tracker — SIP, Value Screener, Tier List, 7-Year Projection. Free forever.">
+<meta name="theme-color" content="#22c55e">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="PSX Invest">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app">
+
+  <!-- Install Banner -->
+  <div class="install-banner" id="installBanner" style="display:none">
+    <span>📲 Install PSX Dividend Machine as an app</span>
+    <button class="install-btn" id="installBtn">Install Free</button>
+    <button class="install-close" id="installClose">✕</button>
+  </div>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="header-inner">
+      <div class="logo">
+        <img src="icons/icon-72.png" alt="PSX" class="logo-img">
+        <div>
+          <div class="logo-title">PSX Dividend Machine</div>
+          <div class="logo-sub">Your Personal Investment Command Center</div>
+        </div>
+      </div>
+      <div class="header-stats">
+        <div class="hstat"><div class="hstat-val" id="hMonthNum">Month 5</div><div class="hstat-lbl">Current</div></div>
+        <div class="hstat-div"></div>
+        <div class="hstat"><div class="hstat-val" id="hTotal">₨57,200</div><div class="hstat-lbl">Invested</div></div>
+        <div class="hstat-div"></div>
+        <div class="hstat"><div class="hstat-val green" id="hGoalPct">2.4%</div><div class="hstat-lbl">Goal</div></div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Nav Tabs -->
+  <nav class="tabs" id="navTabs">
+    <button class="tab active" onclick="switchTab('overview',this)">🏠 Overview</button>
+    <button class="tab" onclick="switchTab('portfolio',this)">💼 Portfolio</button>
+    <button class="tab" onclick="switchTab('roadmap')">📋 Roadmap</button>
+    <button class="tab" onclick="switchTab('history')">📜 History</button>
+    <button class="tab" onclick="switchTab('screener')">🔬 Screener</button>
+    <button class="tab" onclick="switchTab('tierlist',this)">🏆 Tier List</button>
+    <button class="tab" onclick="switchTab('buytool',this)">🛒 Buy Tool</button>
+    <button class="tab" onclick="switchTab('projection',this)">📊 7-Year</button>
+    <button class="tab" onclick="switchTab('settings',this)">⚙️ Settings</button>
+  </nav>
+
+  <!-- Content -->
+  <main class="content">
+    <div id="tab-overview"    class="tab-panel active"></div>
+    <div id="tab-portfolio"   class="tab-panel"></div>
+    <div id="tab-roadmap"     class="tab-panel"></div>
+    <div id="tab-history"     class="tab-panel"></div>
+    <div id="tab-sip"         class="tab-panel"></div>
+    <div id="tab-screener"    class="tab-panel"></div>
+    <div id="tab-tierlist"    class="tab-panel"></div>
+    <div id="tab-buytool"     class="tab-panel"></div>
+    <div id="tab-projection"  class="tab-panel"></div>
+    <div id="tab-settings"    class="tab-panel"></div>
+  </main>
+
+  <!-- Mobile Bottom Nav -->
+  <nav class="bottom-nav" id="bottomNav">
+    <button class="bnav-btn active" onclick="switchTab('overview')">
+      <span class="bnav-icon">🏠</span><span class="bnav-lbl">Home</span>
+    </button>
+    <button class="bnav-btn" onclick="switchTab('portfolio')">
+      <span class="bnav-icon">💼</span><span class="bnav-lbl">Portfolio</span>
+    </button>
+    <button class="bnav-btn" onclick="switchTab('roadmap')">
+      <span class="bnav-icon">📋</span><span class="bnav-lbl">Roadmap</span>
+    </button>
+    <button class="bnav-btn" onclick="switchTab('buytool')">
+      <span class="bnav-icon">🛒</span><span class="bnav-lbl">Buy</span>
+    </button>
+    <button class="bnav-btn" onclick="switchTab('settings')">
+      <span class="bnav-icon">⚙️</span><span class="bnav-lbl">Settings</span>
+    </button>
+  </nav>
+
+  <!-- Floating Action Button -->
+  <button class="fab" id="fabAddBuy" onclick="openModal('modalAddBuy')">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+  </button>
+
+  <!-- Modals -->
+  <div class="modal-overlay" id="modalAddBuy">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 style="font-size:18px;font-weight:700">Log New Buy</h3>
+        <button class="modal-close" onclick="closeModal('modalAddBuy')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Stock Symbol</label>
+          <input type="text" id="buySymbol" list="stockList" placeholder="Enter Symbol (e.g. LUCK)">
+          <datalist id="stockList">
+            <option value="HUBC">
+            <option value="FFC">
+            <option value="EFERT">
+            <option value="OGDC">
+            <option value="PPL">
+            <option value="FATIMA">
+            <option value="MEBL">
+            <option value="NATF">
+            <option value="BIPL">
+            <option value="ENGRO">
+            <option value="LUCK">
+            <option value="SYS">
+            <option value="PSO">
+            <option value="MCB">
+            <option value="HBL">
+            <option value="FFBL">
+            <option value="SEARL">
+            <option value="MARI">
+            <option value="TRG">
+          </datalist>
+        </div>
+        <div style="display:flex;gap:12px">
+          <div class="form-group" style="flex:1">
+            <label>Shares Bought</label>
+            <input type="number" id="buyShares" placeholder="e.g. 50" min="1">
+          </div>
+          <div class="form-group" style="flex:1">
+            <label>Price per Share (₨)</label>
+            <input type="number" id="buyPrice" placeholder="e.g. 210.5" step="0.01">
+          </div>
+        </div>
+        <button class="btn-primary" onclick="submitAddBuy()" style="width:100%;margin-top:16px">Save Transaction</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modalSell">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 style="font-size:18px;font-weight:700">➖ Log Sale</h3>
+        <button class="modal-close" onclick="closeModal('modalSell')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Stock Symbol</label>
+          <input type="text" id="sellSymbol" list="stockList" placeholder="e.g. HUBC">
+        </div>
+        <div style="display:flex;gap:12px">
+          <div class="form-group" style="flex:1">
+            <label>Shares Sold</label>
+            <input type="number" id="sellShares" placeholder="e.g. 10">
+          </div>
+          <div class="form-group" style="flex:1">
+            <label>Sale Price (₨)</label>
+            <input type="number" id="sellPrice" placeholder="e.g. 230.5">
+          </div>
+        </div>
+        <button class="btn-primary" onclick="submitSell()" style="width:100%;margin-top:16px;background:var(--red)">Record Sale</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Log Dividend -->
+  <div class="modal-overlay" id="modalLogDividend">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 style="font-size:18px;font-weight:700">💰 Log Dividend Arrival</h3>
+        <button class="modal-close" onclick="closeModal('modalLogDividend')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Stock Symbol</label>
+          <input type="text" id="divSymbol" list="stockList" placeholder="e.g. FFC">
+        </div>
+        <div class="form-group">
+          <label>Amount Received (₨)</label>
+          <input type="number" id="divAmount" placeholder="e.g. 2500">
+        </div>
+        <div class="form-group">
+          <label>Notes (Optional)</label>
+          <input type="text" id="divNote" placeholder="e.g. Final Dividend 2025">
+        </div>
+        <button class="btn-primary" onclick="submitLogDividend()" style="width:100%;margin-top:16px;background:var(--green)">Save Dividend</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PIN Lock Screen -->
+  <div id="pinOverlay" class="pin-overlay" style="display:none">
+    <div class="pin-box">
+      <div style="font-size:48px;margin-bottom:20px;filter:drop-shadow(0 0 10px rgba(34,197,94,0.3))">🔒</div>
+      <h2 style="font-size:24px;font-weight:800;margin-bottom:8px;letter-spacing:-0.5px">Vault Locked</h2>
+      <p style="color:var(--muted);font-size:14px;margin-bottom:40px">Enter PIN to access your portfolio</p>
+      
+      <div class="pin-display" id="pinDisplay"></div>
+      
+      <div class="pin-pad">
+        <button onclick="handlePinInput('1')">1</button><button onclick="handlePinInput('2')">2</button><button onclick="handlePinInput('3')">3</button>
+        <button onclick="handlePinInput('4')">4</button><button onclick="handlePinInput('5')">5</button><button onclick="handlePinInput('6')">6</button>
+        <button onclick="handlePinInput('7')">7</button><button onclick="handlePinInput('8')">8</button><button onclick="handlePinInput('9')">9</button>
+        <button onclick="handlePinInput('✕')">✕</button><button onclick="handlePinInput('0')">0</button><button onclick="handlePinInput('C')">C</button>
+      </div>
+
+      <button id="biometricLoginBtn" class="biometric-btn" style="display:none" onclick="authenticateBiometrics()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          <path d="M12 8v4"/><path d="M12 16h.01"/>
+        </svg>
+        Unlock with Fingerprint / Face ID
+      </button>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="toastContainer" class="toast-container"></div>
+
+</div>
+
+<script src="data.js"></script>
+<script src="app.js"></script>
+<script>
+// PWA Service Worker Registration
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').then(reg => {
+      console.log('SW registered:', reg.scope);
+    }).catch(err => console.log('SW error:', err));
+  });
+}
+
+// Install Prompt
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredPrompt = e;
+  document.getElementById('installBanner').style.display = 'flex';
+});
+
+document.getElementById('installBtn')?.addEventListener('click', async () => {
+  if (!deferredPrompt) return;
+  deferredPrompt.prompt();
+  const { outcome } = await deferredPrompt.userChoice;
+  deferredPrompt = null;
+  document.getElementById('installBanner').style.display = 'none';
+});
+
+document.getElementById('installClose')?.addEventListener('click', () => {
+  document.getElementById('installBanner').style.display = 'none';
+});
+
+window.addEventListener('appinstalled', () => {
+  document.getElementById('installBanner').style.display = 'none';
+});
+
+// Handle hash-based shortcuts from manifest
+const hash = window.location.hash.replace('#','');
+if (hash && ['overview','portfolio','sip','screener','tierlist','buytool','projection'].includes(hash)) {
+  window.addEventListener('DOMContentLoaded', () => switchTab(hash));
+}
+</script>
+</body>
+</html>
