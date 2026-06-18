@@ -33,3 +33,6 @@ Thumbs.db
 *.mp4
 *.log
 scratch/
+
+# Local Netlify folder
+.netlify

@@ -1,6 +1,6 @@
 [build]
   # Netlify doesn't have Flutter installed by default. We use the build.sh script.
-  command = "./build.sh"
+  # command = "./build.sh" (Commented out because we built it locally on Windows!)
   
   # The output directory that Netlify will deploy
   publish = "psx_app/build/web"
