@@ -37,6 +37,23 @@ class PsxData {
 
   static final List<Map<String, dynamic>> roadmapParts = [
     {
+      "part": 0, "label": "PART 0 — Initial Setup",
+      "months": "Month 1 → 5", "icon": "🏗️",
+      "theme": "Buy the 9 stocks for the first time. Spread across all positions to establish your base.",
+      "monthRange": [1, 5], "budget": 10000,
+      "allocs": [
+        { "s": "HUBC", "amt": 2500, "note": "Start with highest-yield core" },
+        { "s": "FFC", "amt": 2000, "note": "Fertilizer cornerstone" },
+        { "s": "EFERT", "amt": 2000, "note": "Highest yield in fertilizer" },
+        { "s": "OGDC", "amt": 2000, "note": "Government-backed energy" },
+        { "s": "PPL", "amt": 1500, "note": "Energy support" },
+      ],
+      "special": "Open CDC account in Month 1 if not already done. Buy BIPL, NATF, FATIMA, MEBL later when you have extra cash.",
+      "divTarget": "~Rs5,000–8,000/year by Month 5",
+      "rule": "Do not chase performance. Buy regardless of short-term price direction."
+    },
+    {
+
       "part": 1, "label": "PART 1 — Correction + Foundation",
       "months": "Month 6 → 12", "icon": "🔥",
       "theme": "Build the base. Average down FFC & EFERT. Lock in HUBC.",

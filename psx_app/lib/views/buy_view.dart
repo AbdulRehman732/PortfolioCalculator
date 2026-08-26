@@ -47,6 +47,9 @@ class _BuyViewState extends State<BuyView> {
   @override
   Widget build(BuildContext context) {
     final service = Provider.of<PsxService>(context);
+    final sipMonth = service.currentSipMonth;
+    final partIndex = service.currentRoadmapPartIndex;
+    final currentPart = service.currentRoadmapPart;
 
     // Default list: all portfolio stocks
     final portfolioSymbols = service.portfolio.map((s) => s.symbol).toSet();
@@ -120,10 +123,10 @@ class _BuyViewState extends State<BuyView> {
                       const Icon(Icons.shopping_cart_outlined,
                           color: Colors.white54, size: 20),
                       const SizedBox(width: 8),
-                      const Expanded(
+                      Expanded(
                         child: Text(
-                          'Monthly Buy Tool — Month 5 Decision',
-                          style: TextStyle(
+                          'Monthly Buy Tool — Month $sipMonth',
+                          style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
                               color: Colors.white),
@@ -132,22 +135,89 @@ class _BuyViewState extends State<BuyView> {
                     ],
                   ),
                   const SizedBox(height: 8),
-                  RichText(
-                    text: const TextSpan(
-                      style: TextStyle(
-                          fontSize: 13, color: Colors.white70, height: 1.5),
+                  // Roadmap part badge
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF10b981).withOpacity(0.08),
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(
+                          color: const Color(0xFF10b981).withOpacity(0.25)),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        TextSpan(
-                            text:
-                                'S-Tier system: SIP Rs10,000 this month. Focus: '),
-                        TextSpan(
-                            text: 'Correction + Foundation. ',
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white)),
-                        TextSpan(
-                            text:
-                                'Check ratios + BR news before buying.'),
+                        Row(
+                          children: [
+                            Text(
+                              currentPart['icon'] ?? '📈',
+                              style: const TextStyle(fontSize: 16),
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                currentPart['label'] ?? 'Part ${partIndex + 1}',
+                                style: const TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.bold,
+                                    color: Color(0xFF10b981)),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          currentPart['theme'] ?? '',
+                          style: const TextStyle(
+                              color: Colors.white70, fontSize: 12, height: 1.4),
+                        ),
+                        const SizedBox(height: 10),
+                        const Text(
+                          'This month\'s allocations:',
+                          style: TextStyle(
+                              color: Colors.white54,
+                              fontSize: 11,
+                              fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(height: 6),
+                        ...((currentPart['allocs'] as List<dynamic>? ?? []))
+                            .map((a) => Padding(
+                                  padding:
+                                      const EdgeInsets.only(bottom: 4),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        '${a['s']}',
+                                        style: const TextStyle(
+                                            color: Colors.white70,
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w600),
+                                      ),
+                                      Text(
+                                        'Rs ${a['amt']}',
+                                        style: const TextStyle(
+                                            color: Color(0xFF10b981),
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                    ],
+                                  ),
+                                ))
+                            .toList(),
+                        if (currentPart['special'] != null) ...[
+                          const SizedBox(height: 6),
+                          Text(
+                            '💡 ${currentPart['special']}',
+                            style: const TextStyle(
+                                color: Colors.white38,
+                                fontSize: 11,
+                                height: 1.4),
+                          ),
+                        ],
                       ],
                     ),
                   ),

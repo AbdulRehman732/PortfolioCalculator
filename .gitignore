@@ -1,11 +1,33 @@
-# ─── Node.js / Backend ───────────────────────────────────────────────────────
-node_modules/
+# ─── Environment / Secrets ───────────────────────────────────────────────────
+.env
+.env.*
+!.env.example
+*.env
+**/.env
+**/.env.*
+!**/.env.example
+
+# ─── Large Media & Video Files ───────────────────────────────────────────────
+*.mp4
+*.mov
+*.avi
+*.mkv
+videos/
+**/videos/
+
+# ─── Temp / Archives / Logs ──────────────────────────────────────────────────
+*.zip
+*.tar.gz
+*.rar
+*.7z
+*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-.env
-.env.local
-.env.*.local
+
+# ─── Node.js / Backend ───────────────────────────────────────────────────────
+node_modules/
+**/node_modules/
 dist/
 coverage/
 
@@ -19,20 +41,20 @@ psx_app/.pub/
 psx_app/build/
 psx_app/pubspec.lock
 psx_app/.idea/
+psx_app/scratch/
+psx_app/ffc_page.html
+psx_app/script.js
+scratch/
+**/scratch/
 *.iml
 
-# ─── OS / IDE ─────────────────────────────────────────────────────────────────
+# ─── OS / IDE / AI Tooling ────────────────────────────────────────────────────
 .DS_Store
 Thumbs.db
 .vscode/
 .idea/
 *.swp
 *.swo
-
-# ─── Misc ─────────────────────────────────────────────────────────────────────
-*.mp4
-*.log
-scratch/
-
-# Local Netlify folder
-.netlify
+.agent/
+.qodo/
+.netlify/

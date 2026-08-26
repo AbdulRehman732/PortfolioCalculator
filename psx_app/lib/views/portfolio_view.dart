@@ -30,7 +30,35 @@ class PortfolioView extends StatelessWidget {
           const SizedBox(height: 4),
           const Text('Tap a stock to log transactions. Swipe to remove.',
               style: TextStyle(fontSize: 13, color: Colors.white54)),
-          const SizedBox(height: 16),
+          const SizedBox(height: 8),
+          if (service.isLoadingLivePrices)
+            Container(
+              margin: const EdgeInsets.only(bottom: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              decoration: BoxDecoration(
+                color: const Color(0xFF10b981).withOpacity(0.08),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: const Color(0xFF10b981).withOpacity(0.2)),
+              ),
+              child: const Row(
+                children: [
+                  SizedBox(
+                    width: 12,
+                    height: 12,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: Color(0xFF10b981),
+                    ),
+                  ),
+                  SizedBox(width: 10),
+                  Text(
+                    'Fetching live prices…',
+                    style: TextStyle(color: Color(0xFF10b981), fontSize: 12),
+                  ),
+                ],
+              ),
+            ),
+          const SizedBox(height: 8),
           Expanded(
             child: RefreshIndicator(
               color: const Color(0xFF10b981),

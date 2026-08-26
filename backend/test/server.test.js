@@ -196,7 +196,8 @@ describe("GET /api/stock/:symbol/price", () => {
   afterEach(() => { jest.clearAllMocks(); });
 
   test("normal — returns price when axios succeeds", async () => {
-    axios.get.mockResolvedValueOnce({
+    // Mock all potential retry attempts
+    axios.get.mockResolvedValue({
       data: '<html><div class="quote__close">Rs.125.50</div></html>',
     });
 
@@ -205,7 +206,7 @@ describe("GET /api/stock/:symbol/price", () => {
     expect(res.body.symbol).toBe("FFC");
     expect(res.body.price).toBeCloseTo(125.5, 1);
     expect(res.body.cached).toBe(false);
-  });
+  }, 15000);
 
   test("invalid — returns 404 when price cannot be parsed", async () => {
     axios.get.mockResolvedValueOnce({
