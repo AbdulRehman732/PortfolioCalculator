@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: psx-dividend-backend
+    env: node
+    region: singapore
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: node server.js
+    healthCheckPath: /api/health
+    envVars:
+      - key: PORT
+        value: 10000
+      - key: NODE_ENV
+        value: production
+      - key: API_KEY
+        generateValue: true  # Render auto-generates a secure random value
